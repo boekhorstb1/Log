@@ -26,18 +26,27 @@ class ConstraintFilterTest extends TestCase {
         $this->level1 = new LogLevel(1, 'testName1');
         $this->level2 = new LogLevel(2, 'testName2');
         $this->message1 = 'testMessage1';
-        $this->message2 = 'testMessage2';
+        $this->message2 = 'required_field';
+        $this->context2 = ['required_field'];
         $this->logMessage1 = new LogMessage($this->level1, $this->message1);
         $this->logMessage2 = new LogMessage($this->level2, $this->message2);
     }
 
     public function testFilterDoesNotAcceptWhenRequiredFieldIsMissing(){
 
-        $filterator = new ConstraintFilter();
-        $filterator->addRequiredField('required_field');
+        $this->filterator->addRequiredField('required_field');
 
-        $this->assertFalse($filterator->accept($this->logMessage1));
+        $this->assertFalse($this->filterator->accept($this->logMessage1));
 
+    }
+
+
+    public function testFilterAcceptsWhenRequiredFieldisPresent()
+    {
+        //NB: I did not found a way to add a field called "required field" as has been done in ConstraintTest.php
+        $filterator = $this->filterator;
+        $filterator->addRequiredField('message');
+        $this->assertTrue($this->filterator->accept($this->logMessage2));
     }
 
 }
