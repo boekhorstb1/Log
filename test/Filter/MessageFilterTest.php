@@ -24,7 +24,7 @@ use TypeError;
 
 
 
-class MessageSrcTest extends TestCase
+class MessageFilterTest extends TestCase
 {
 
     // public function setUp(): void
