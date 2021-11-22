@@ -31,10 +31,13 @@ class SuppressSrcTest extends TestCase
         $this->filter = new SuppressFilter();
         $this->level1 = new LogLevel(1, 'testName1');
         $this->level2 = new LogLevel(2, 'testName2');
+        $this->level3 = new LogLevel(3, 'testName3');
         $this->message1 = "test1";
         $this->message2 = "test2";
+        $this->message3 = "test3";
         $this->logMessage1 = new LogMessage($this->level1, $this->message1);
         $this->logMessage2 = new LogMessage($this->level2, $this->message2);
+        $this->logMessage3 = new LogMessage($this->level3, $this->message3);
     }
 
     
@@ -66,6 +69,6 @@ class SuppressSrcTest extends TestCase
         $this->filter->suppress(false);
         $this->assertTrue($this->filter->accept($this->logMessage2));
         $this->filter->suppress(true);
-        $this->assertFalse($this->filter->accept($this->logMessage1));
+        $this->assertFalse($this->filter->accept($this->logMessage3));
     }
 }
