@@ -16,10 +16,8 @@ namespace Horde\Log\Test\Filter;
 
 use \PHPUnit\Framework\TestCase;
 use Horde\Log\Filter\SuppressFilter;
-use Horde\Log\LogFilter;
 use Horde\Log\LogMessage;
 use Horde\Log\LogLevel;
-use TypeError;
 
 
 
