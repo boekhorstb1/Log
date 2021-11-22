@@ -19,6 +19,7 @@ use \PHPUnit\Framework\TestCase;
 use Horde\Log\Filter\MessageFilter;
 use Horde\Log\LogFilter;
 use Horde\Log\LogMessage;
+use Horde\Log\LogLevel;
 use InvalidArgumentException;
 use TypeError;
 
@@ -27,13 +28,26 @@ use TypeError;
 class MessageFilterTest extends TestCase
 {
 
-    // public function setUp(): void
-    // {
-        
-    // }
+    public function setUp(): void
+    {
+        $this->level1 = new LogLevel(1, 'testName1');
+        $this->level2 = new LogLevel(2, 'testName2');
+        $this->message1 = "foo accept bar";
+        $this->message2 = "foo reject bar";
+        $this->logMessage1 = new LogMessage($this->level1, $this->message1);
+        $this->logMessage2 = new LogMessage($this->level2, $this->message2);
+    }
 
     public function testMessageFilterRecognizesInvalidRegularExpression(){
         $this->expectException('InvalidArgumentException');
         new MessageFilter('invalid regexp');
     }
+
+    public function testMessageFilter()
+    {
+        $filter = new MessageFilter('/accept/');
+        $this->assertTrue($filter->accept($this->logMessage1));
+        $this->assertFalse($filter->accept($this->logMessage2));
+    }
+
 }
