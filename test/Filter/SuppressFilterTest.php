@@ -24,7 +24,7 @@ use TypeError;
 
 
 
-class SuppressSrcTest extends TestCase
+class SuppressFilterTest extends TestCase
 {
     public function setUp(): void
     {
