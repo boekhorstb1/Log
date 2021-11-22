@@ -17,11 +17,9 @@ namespace Horde\Log\Test\Filter;
 
 use \PHPUnit\Framework\TestCase;
 use Horde\Log\Filter\MessageFilter;
-use Horde\Log\LogFilter;
 use Horde\Log\LogMessage;
 use Horde\Log\LogLevel;
-use InvalidArgumentException;
-use TypeError;
+
 
 
 
