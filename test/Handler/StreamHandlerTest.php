@@ -19,4 +19,16 @@ use PHPUnit\Framework\TestCase;
 
 class StreamHandlerTest extends TestCase
 {
+    public function setUp(): void
+    {
+        date_default_timezone_set('America/New_York');
+    }
+
+    public function testConstructorThrowsWhenResourceIsNotStream()
+    {
+        $this->expectException('Horde_Log_Exception');
+        $resource = xml_parser_create();
+        new Horde_Log_Handler_Stream($resource);
+        xml_parser_free($resource);
+    }
 }
