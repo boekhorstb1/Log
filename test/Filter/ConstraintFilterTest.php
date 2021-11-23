@@ -63,7 +63,7 @@ class ConstraintFilterTest extends TestCase {
     {
 
         $filterator = new ConstraintFilter();
-        $filterator->addRegex('message', '/this value does not exist/'); 
+        $filterator->addRegex('message', '/this value does not exist/');
 
         $this->assertFalse($filterator->accept($this->logMessage3));
     }
@@ -80,8 +80,10 @@ class ConstraintFilterTest extends TestCase {
     public function testFilterCallsEvalOnAllConstraintsWhenTheyAreAllTrue()
     {
         $filterator = new ConstraintFilter();
-        $filterator->addConstraint('level', $this->getConstraintMock(true));
-        $filterator->addConstraint('message', $this->getConstraintMock(true)); // again only the field message seems to be "constraintable"
+        $filterator->addConstraint('context', $this->getConstraintMock(true));
+        $filterator->addConstraint('level', $this->getConstraintMock(true)); 
+        $filterator->addConstraint('message', $this->getConstraintMock(true)); 
+        $filterator->addConstraint('dafdfadg234435dafdf', $this->getConstraintMock(true)); 
 
         $filterator->accept($this->logMessage3);
     }
@@ -89,14 +91,14 @@ class ConstraintFilterTest extends TestCase {
     public function testFilterStopsWhenItFindsAFalseCondition()
     {
         $filterator = new ConstraintFilter();
-        $filterator->addConstraint('message', $this->getConstraintMock(true));
-        $filterator->addConstraint('message', $this->getConstraintMock(true));
-        $filterator->addConstraint('message', new Horde_Constraint_AlwaysFalse()); // this test only worlds for the field message 
+        $filterator->addConstraint('mesrg2345rfsage', $this->getConstraintMock(true));
+        $filterator->addConstraint('medafadfssage', $this->getConstraintMock(true));
+        $filterator->addConstraint('whatever', new Horde_Constraint_AlwaysFalse()); 
 
         $const = $this->getMockBuilder('Horde_Constraint', array('evaluate'))->getMock();
         $const->expects($this->never())
             ->method('evaluate');
-        $filterator->addConstraint('message', $const);
+        $filterator->addConstraint('test', $const);
         $filterator->accept($this->logMessage3);
     }
 
