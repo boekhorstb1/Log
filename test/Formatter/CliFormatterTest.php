@@ -34,21 +34,52 @@ class CliFormatterTest extends TestCase {
         $this->message3 = "some info here!";
         $this->logMessage1 = new LogMessage($this->level1, $this->message1);
         $this->logMessage2 = new LogMessage($this->level2, $this->message2);
-        $this->logMessage2 = new LogMessage($this->level3, $this->message3);
+        $this->logMessage3 = new LogMessage($this->level3, $this->message3);
 
     }
 
     public function testDefaultFormat(){
+
         $f = new CliFormatter($this->cli);
         $line = $f->format($this->logMessage1);
 
         $loglevel = $this->logMessage1->level();
         $name = $loglevel->name();
-        $criticality = $loglevel->criticality();
 
+        # Note: the cliformatter does not output the value of "Criticallity"
+        // $criticality = $loglevel->criticality();
+        
         $this->assertStringContainsString($this->message1 , $line);
-        $this->assertStringContainsString($name, $line);
-        $this->assertStringContainsString($criticality, $line);
+        $this->assertStringContainsString($name, $line);    
     }
+
+    public function testColorSettings(){
+
+        $f = new CliFormatter($this->cli);
+        $line = $f->format($this->logMessage1);
+
+        $loglevel = $this->logMessage1->level();
+        $name = $loglevel->name();
+
+        switch ($name) {
+            case 'Emergency':
+                $this->assertStringContainsString("\e[31m", $line);  
+                break;
+            case 'warning':
+                $this->assertStringContainsString("\e[33m", $line);  
+                break;
+            case 'info':
+                $this->assertStringContainsString("\e[34m", $line);  
+                break;
+            default:
+                $this->assertStringContainsString("\e[39m", $line);
+                break;
+        }
+
+        
+
+    }
+
+    
 
 }
