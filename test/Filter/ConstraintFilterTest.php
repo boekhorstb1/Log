@@ -8,18 +8,18 @@
  * @package    Log
  * @subpackage UnitTests
  */
+
 namespace Horde\Log\Test\Filter;
-use \PHPUnit\Framework\TestCase;
+
+use PHPUnit\Framework\TestCase;
 
 use Horde\Log\Filter\ConstraintFilter;
 use Horde\Log\LogMessage;
 use Horde\Log\LogLevel;
-use \Horde_Constraint_AlwaysFalse;
+use Horde_Constraint_AlwaysFalse;
 
-
-class ConstraintFilterTest extends TestCase {
-
-
+class ConstraintFilterTest extends TestCase
+{
     public function setUp(): void
     {
         $this->level1 = new LogLevel(1, 'testName1');
@@ -28,17 +28,16 @@ class ConstraintFilterTest extends TestCase {
         $this->message1 = 'testMessage1';
         $this->message2 = 'required_field';
         $this->message3 = 'somevalue';
-        $this->context3 = ['customField3' => 'custumValue3'];
         $this->logMessage1 = new LogMessage($this->level1, $this->message1);
         $this->logMessage2 = new LogMessage($this->level2, $this->message2);
-        $this->logMessage3 = new LogMessage($this->level3, $this->message3, $this->context3);
+        $this->logMessage3 = new LogMessage($this->level3, $this->message3, ['customField3' => 'custumValue3']);
     }
 
-    public function testFilterDoesNotAcceptWhenRequiredFieldIsMissing(){
+    public function testFilterDoesNotAcceptWhenRequiredFieldIsMissing()
+    {
         $filterator = new ConstraintFilter();
         $filterator->addRequiredField('required_field');
-        $this->assertFalse($filterator->accept($this->logMessage1));
-
+        $this->assertFalse($filterator->accept($this->logMessage3));
     }
 
 
@@ -52,14 +51,13 @@ class ConstraintFilterTest extends TestCase {
     public function testFilterAcceptsWhenRegexMatchesField()
     {
         $filterator = new ConstraintFilter();
-        $filterator->addRegex('customField3', '/cust*/'); 
+        $filterator->addRegex('customField3', '/cust*/');
 
         $this->assertTrue($filterator->accept($this->logMessage3));
     }
 
     public function testFilterAcceptsWhenRegex_DOESNOT_MatcheField()
     {
-
         $filterator = new ConstraintFilter();
         $filterator->addRegex('customField3', '/this value does not exist/');
 
@@ -79,9 +77,9 @@ class ConstraintFilterTest extends TestCase {
     {
         $filterator = new ConstraintFilter();
         $filterator->addConstraint('context', $this->getConstraintMock(true));
-        $filterator->addConstraint('level', $this->getConstraintMock(true)); 
-        $filterator->addConstraint('message', $this->getConstraintMock(true)); 
-        $filterator->addConstraint('dafdfadg234435dafdf', $this->getConstraintMock(true)); 
+        $filterator->addConstraint('level', $this->getConstraintMock(true));
+        $filterator->addConstraint('message', $this->getConstraintMock(true));
+        $filterator->addConstraint('dafdfadg234435dafdf', $this->getConstraintMock(true));
 
         $filterator->accept($this->logMessage3);
     }
@@ -91,7 +89,7 @@ class ConstraintFilterTest extends TestCase {
         $filterator = new ConstraintFilter();
         $filterator->addConstraint('fieldname', $this->getConstraintMock(true));
         $filterator->addConstraint('fieldname', $this->getConstraintMock(true));
-        $filterator->addConstraint('fieldname', new Horde_Constraint_AlwaysFalse()); 
+        $filterator->addConstraint('fieldname', new Horde_Constraint_AlwaysFalse());
 
         $const = $this->getMockBuilder('Horde_Constraint', array('evaluate'))->getMock();
         $const->expects($this->never())
@@ -110,5 +108,4 @@ class ConstraintFilterTest extends TestCase {
         $filterator->addConstraint('non existant field', $const);
         $filterator->accept($this->logMessage2);
     }
-
 }
