@@ -28,7 +28,7 @@ class ConstraintFilterTest extends TestCase {
         $this->message1 = 'testMessage1';
         $this->message2 = 'required_field';
         $this->message3 = 'somevalue';
-        $this->context3 = ['somecontext'];
+        $this->context3 = ['customField3' => 'custumValue3'];
         $this->logMessage1 = new LogMessage($this->level1, $this->message1);
         $this->logMessage2 = new LogMessage($this->level2, $this->message2);
         $this->logMessage3 = new LogMessage($this->level3, $this->message3, $this->context3);
@@ -44,17 +44,15 @@ class ConstraintFilterTest extends TestCase {
 
     public function testFilterAcceptsWhenRequiredFieldisPresent()
     {
-        //NB: I did not found a way to add a field called "required field" as has been done in ConstraintTest.php
-        // Because one cannot manually define a field (right?), I am not sure if "addRequriedField" is usefull in its current form
         $filterator = new ConstraintFilter();
-        $filterator->addRequiredField('message'); //NB: this seems only to be working for 'message', it is not wokring for 'level' which is also a field that is present
-        $this->assertTrue($filterator->accept($this->logMessage2));
+        $filterator->addRequiredField('customField3');
+        $this->assertTrue($filterator->accept($this->logMessage3));
     }
 
     public function testFilterAcceptsWhenRegexMatchesField()
     {
         $filterator = new ConstraintFilter();
-        $filterator->addRegex('message', '/some*/'); // again only the field message seems to be searchable with regex, none of the others
+        $filterator->addRegex('customField3', '/cust*/'); 
 
         $this->assertTrue($filterator->accept($this->logMessage3));
     }
@@ -63,7 +61,7 @@ class ConstraintFilterTest extends TestCase {
     {
 
         $filterator = new ConstraintFilter();
-        $filterator->addRegex('message', '/this value does not exist/');
+        $filterator->addRegex('customField3', '/this value does not exist/');
 
         $this->assertFalse($filterator->accept($this->logMessage3));
     }
@@ -91,14 +89,14 @@ class ConstraintFilterTest extends TestCase {
     public function testFilterStopsWhenItFindsAFalseCondition()
     {
         $filterator = new ConstraintFilter();
-        $filterator->addConstraint('mesrg2345rfsage', $this->getConstraintMock(true));
-        $filterator->addConstraint('medafadfssage', $this->getConstraintMock(true));
-        $filterator->addConstraint('whatever', new Horde_Constraint_AlwaysFalse()); 
+        $filterator->addConstraint('fieldname', $this->getConstraintMock(true));
+        $filterator->addConstraint('fieldname', $this->getConstraintMock(true));
+        $filterator->addConstraint('fieldname', new Horde_Constraint_AlwaysFalse()); 
 
         $const = $this->getMockBuilder('Horde_Constraint', array('evaluate'))->getMock();
         $const->expects($this->never())
             ->method('evaluate');
-        $filterator->addConstraint('test', $const);
+        $filterator->addConstraint('fieldname', $const);
         $filterator->accept($this->logMessage3);
     }
 
