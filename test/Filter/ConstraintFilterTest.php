@@ -25,13 +25,31 @@ class ConstraintFilterTest extends TestCase
         $this->level1 = new LogLevel(1, 'testName1');
         $this->level2 = new LogLevel(2, 'testName2');
         $this->level3 = new LogLevel(3, 'testName3');
+        $this->level4 = new LogLevel(4, 'testName4');
         $this->message1 = 'testMessage1';
         $this->message2 = 'required_field';
         $this->message3 = 'somevalue';
+        $this->message4 = 'multiple required fields';
         $this->logMessage1 = new LogMessage($this->level1, $this->message1);
         $this->logMessage2 = new LogMessage($this->level2, $this->message2);
         $this->logMessage3 = new LogMessage($this->level3, $this->message3, ['customField3' => 'custumValue3']);
+        $this->logMessage4 = new LogMessage($this->level4, $this->message4, ['customField4' => 'custumValue4', 'customField5' => 'custumValue5']);
     }
+
+    public function testFilterAcceptMultipleRequiredFieldsIfPresent()
+    {
+        $filterator = new ConstraintFilter();
+        $filterator->addRequiredFields('customField4', 'customField5');
+        $this->assertTrue($filterator->accept($this->logMessage4));
+    }
+
+    public function testFilterNotAcceptMultipleRequiredFieldsIfNotPresent()
+    {
+        $filterator = new ConstraintFilter();
+        $filterator->addRequiredFields('customField3', 'customField4');
+        $this->assertFalse($filterator->accept($this->logMessage4));
+    }
+
 
     public function testFilterDoesNotAcceptWhenRequiredFieldIsMissing()
     {
