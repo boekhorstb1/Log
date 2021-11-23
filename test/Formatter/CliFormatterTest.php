@@ -56,26 +56,32 @@ class CliFormatterTest extends TestCase {
     public function testColorSettings(){
 
         $f = new CliFormatter($this->cli);
-        $line = $f->format($this->logMessage1);
 
-        $loglevel = $this->logMessage1->level();
-        $name = $loglevel->name();
+        $logsarray = [$this->logMessage1, $this->logMessage2, $this->logMessage3];
+        // dd($logsarray);
 
-        switch ($name) {
-            case 'Emergency':
-                $this->assertStringContainsString("\e[31m", $line);  
-                break;
-            case 'warning':
-                $this->assertStringContainsString("\e[33m", $line);  
-                break;
-            case 'info':
-                $this->assertStringContainsString("\e[34m", $line);  
-                break;
-            default:
-                $this->assertStringContainsString("\e[39m", $line);
-                break;
+        foreach($logsarray as $key => $value){
+
+            $line = $f->format($value);
+
+            $loglevel = $value->level();
+            $name = $loglevel->name();
+
+            switch ($name) {
+                case 'emergency':
+                    $this->assertStringContainsString("\e[31m", $line);  
+                    break;
+                case 'warning':
+                    $this->assertStringContainsString("\e[33m", $line);  
+                    break;
+                case 'info':
+                    $this->assertStringContainsString("\e[34m", $line);  
+                    break;
+                default:
+                    $this->assertStringContainsString("\e[39m", $line);
+                    break;
+            }
         }
-
         
 
     }
