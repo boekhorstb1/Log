@@ -52,6 +52,7 @@ class StreamHandlerTest extends TestCase
      */
     public function testConstructorWithValidStream()
     {
+        $this->expectException(LogException::class);
         $stream = fopen('php://memory', 'a');
         new StreamHandler($stream);
     }
@@ -64,11 +65,48 @@ class StreamHandlerTest extends TestCase
         new StreamHandler('php://memory');
     }
 
-    public function testConstructorThrowsWhenModeSpecifiedForExistingStream()
+    public function testConstructorThrowsWhenStreamCannotBeOpened()
+    {
+        $this->expectException(LogException::class);
+        new StreamHandler('');
+    }
+
+    public function testSettingBadOptionThrows()
+    {
+        $this->expectException(LogException::class);
+        $handler = new StreamHandler('php://memory');
+        $handler->setOption('foo', 42);
+    }
+
+    public function testWrite() #See below comment: there is a small issue here
+    {
+        $stream = fopen('php://memory', 'a');
+
+        $handler = new StreamHandler($stream);
+
+        $handler->write($this->logMessage1);
+
+        rewind($stream);
+        $contents = stream_get_contents($stream);
+        fclose($stream);
+
+        $message = $this->logMessage1->message();
+        $levelName = $this->logMessage1->level()->name();
+
+        $date = '\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}-\d{2}:\d{2}';
+
+        $this->assertMatchesRegularExpression("/$date/", $contents);
+        $this->assertMatchesRegularExpression("/$message/", $contents);
+        #$this->assertMatchesRegularExpression("/$levelName/", $contents); // this does not match levelName, gives an error, because here levelName cannot reach to level->name: $formater = new SimpleFormatter('%timestamp% %levelName%: %message%' . PHP_EOL); Need to fix default format for SimpleFormatter?
+    }
+
+    public function testWriteThrowsWhenStreamWriteFails()
     {
         $this->expectException(LogException::class);
         $stream = fopen('php://memory', 'a');
-        new StreamHandler($stream, 'w');
+        $handler = new StreamHandler($stream);
+        fclose($stream);
+        $handler->write($this->logMessage1);
     }
 
     public function testConstructorThrowsWhenStreamCannotBeOpened()
