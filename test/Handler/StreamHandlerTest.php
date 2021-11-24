@@ -87,7 +87,6 @@ class StreamHandlerTest extends TestCase
 
         $handler = new StreamHandler($stream);
         $handler->log($this->logMessage1);
-        $handler->write($this->logMessage1);
 
         rewind($stream);
         $contents = stream_get_contents($stream);
@@ -100,7 +99,7 @@ class StreamHandlerTest extends TestCase
 
         $this->assertMatchesRegularExpression("/$date/", $contents);
         $this->assertMatchesRegularExpression("/$message/", $contents);
-        // $this->assertMatchesRegularExpression("/$levelName/", $contents); // this does not match levelName, gives an error, because here levelName cannot reach to level->name: $formater = new SimpleFormatter('%timestamp% %levelName%: %message%' . PHP_EOL); Need to fix default format for SimpleFormatter?
+        // $this->assertMatchesRegularExpression("/$levelName/", $contents); // this does not match levelName, gives an error, because here levelName cannot reach to level->name with the format '%timestamp% %levelName%: %message%' . PHP_EOL... Need to fix default format for SimpleFormatter?
     }
 
     public function testWriteThrowsWhenStreamWriteFails()
