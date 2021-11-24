@@ -47,19 +47,22 @@ class StreamHandlerTest extends TestCase
         xml_parser_free($resource);
     }
 
-    // public function testConstructorWithValidStream()
-    // {
-    //     $stream = fopen('php://memory', 'a');
-    //     $test = new StreamHandler($stream);
-    //     dd(is_resource($test));
-    //     $this->markTestSkipped('No Exception expected.');
-    // }
+    /**
+     * @doesNotPerformAssertions
+     */
+    public function testConstructorWithValidStream()
+    {
+        $stream = fopen('php://memory', 'a');
+        new StreamHandler($stream);
+    }
 
-    // public function testConstructorWithValidUrl()
-    // {
-    //     new StreamHandler('php://memory');
-    //     $this->markTestSkipped('No Exception expected.');
-    // }
+    /**
+     * @doesNotPerformAssertions
+     */
+    public function testConstructorWithValidUrl()
+    {
+        new StreamHandler('php://memory');
+    }
 
     public function testConstructorThrowsWhenModeSpecifiedForExistingStream()
     {
