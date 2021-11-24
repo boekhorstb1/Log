@@ -15,7 +15,11 @@
 
 namespace Horde\Log\Test\Handler;
 
+use Horde\Log\Handler\StreamHandler;
+
 use PHPUnit\Framework\TestCase;
+
+use Horde\Log\LogException;
 
 class StreamHandlerTest extends TestCase
 {
@@ -26,9 +30,23 @@ class StreamHandlerTest extends TestCase
 
     public function testConstructorThrowsWhenResourceIsNotStream()
     {
-        $this->expectException('Horde_Log_Exception');
+        $this->expectException(LogException::class);
         $resource = xml_parser_create();
-        new Horde_Log_Handler_Stream($resource);
-        xml_parser_free($resource);
+        $test = new StreamHandler($resource);
+        xml_parser_free($resource); # closes the resource, has no other effects (this is only for pre-php8)
+    }
+
+    public function testConstructorWithValidStream()
+    {
+        $stream = fopen('php://memory', 'a');
+        new StreamHandler($stream);
+        $this->markTestSkipped('No Exception expected.');
+    }
+
+    public function testConstructorThrowsWhenModeSpecifiedForExistingStream()
+    {
+        $this->expectException(LogException::class);
+        $stream = fopen('php://memory', 'a');
+        new StreamHandler($stream, 'w');
     }
 }
