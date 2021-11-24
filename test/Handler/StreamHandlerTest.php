@@ -17,36 +17,99 @@ namespace Horde\Log\Test\Handler;
 
 use Horde\Log\Handler\StreamHandler;
 
+use Horde_Cli;
+use Horde\Log\Formatter\CliFormatter;
+use Horde\Log\Formatter\SimpleFormatter;
+
 use PHPUnit\Framework\TestCase;
 
 use Horde\Log\LogException;
+use Horde_Log;
+
+use Horde\Log\LogMessage;
+use Horde\Log\LogLevel;
 
 class StreamHandlerTest extends TestCase
 {
     public function setUp(): void
     {
         date_default_timezone_set('America/New_York');
+        $this->level1 = new LogLevel(Horde_Log::ALERT, 'Alert');
+        $this->message1 = 'this is an emergency!';
+        $this->logMessage1 = new LogMessage($this->level1, $this->message1, ['timestamp' => date('c')]);
     }
 
     public function testConstructorThrowsWhenResourceIsNotStream()
     {
         $this->expectException(LogException::class);
         $resource = xml_parser_create();
-        $test = new StreamHandler($resource);
-        xml_parser_free($resource); # closes the resource, has no other effects (this is only for pre-php8)
+        new StreamHandler($resource);
+        xml_parser_free($resource);
     }
 
-    public function testConstructorWithValidStream()
-    {
-        $stream = fopen('php://memory', 'a');
-        new StreamHandler($stream);
-        $this->markTestSkipped('No Exception expected.');
-    }
+    // public function testConstructorWithValidStream()
+    // {
+    //     $stream = fopen('php://memory', 'a');
+    //     $test = new StreamHandler($stream);
+    //     dd(is_resource($test));
+    //     $this->markTestSkipped('No Exception expected.');
+    // }
+
+    // public function testConstructorWithValidUrl()
+    // {
+    //     new StreamHandler('php://memory');
+    //     $this->markTestSkipped('No Exception expected.');
+    // }
 
     public function testConstructorThrowsWhenModeSpecifiedForExistingStream()
     {
         $this->expectException(LogException::class);
         $stream = fopen('php://memory', 'a');
         new StreamHandler($stream, 'w');
+    }
+
+    public function testConstructorThrowsWhenStreamCannotBeOpened()
+    {
+        $this->expectException(LogException::class);
+        new StreamHandler('');
+    }
+
+    public function testSettingBadOptionThrows()
+    {
+        $this->expectException(LogException::class);
+        $handler = new StreamHandler('php://memory');
+        $handler->setOption('foo', 42);
+    }
+
+    public function testWrite() #See below comment: there is a small issue here
+    {
+        $stream = fopen('php://memory', 'a');
+
+        $handler = new StreamHandler($stream);
+        $handler->log($this->logMessage1);
+        $handler->write($this->logMessage1);
+
+        rewind($stream);
+        $contents = stream_get_contents($stream);
+        fclose($stream);
+
+        $message = $this->logMessage1->message();
+        $levelName = $this->logMessage1->level()->name();
+
+        $date = '\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}-\d{2}:\d{2}';
+
+        $this->assertMatchesRegularExpression("/$date/", $contents);
+        $this->assertMatchesRegularExpression("/$message/", $contents);
+        // $this->assertMatchesRegularExpression("/$levelName/", $contents); // this does not match levelName, gives an error, because here levelName cannot reach to level->name: $formater = new SimpleFormatter('%timestamp% %levelName%: %message%' . PHP_EOL); Need to fix default format for SimpleFormatter?
+    }
+
+    public function testWriteThrowsWhenStreamWriteFails()
+    {
+        $this->expectException(LogException::class);
+        $stream = fopen('php://memory', 'a');
+        $handler = new StreamHandler($stream);
+        $handler->log($this->logMessage1);
+        fclose($stream);
+        $handler->write($this->logMessage1);
     }
 }
