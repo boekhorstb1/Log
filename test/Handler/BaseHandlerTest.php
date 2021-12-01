@@ -46,7 +46,7 @@ class BaseHandlerTest extends TestCase
                  ->method('write')
                  ->will($this->returnValue(null));
 
-        $stub->log($this->logMessage1);
+        $stub->write($this->logMessage1);
     }
 
     public function testSetOptionReturnsErrorWhenWrongParams(): void
