@@ -31,13 +31,15 @@ class BaseHandlerTest extends TestCase
         $this->level1 = new LogLevel(Horde_Log::ALERT, 'Alert');
         $this->message1 = 'this is an emergency!';
         $this->logMessage1 = new LogMessage($this->level1, $this->message1, ['timestamp' => date('c')]);
+
+        $this->stub = $this->getMockForAbstractClass(BaseHandler::class);
     }
 
-    public function testAbstractWriteFunctionsMustReturnBool(): void
+    public function testAbstractWriteFunctionsMustReturnBool(): void 
     {
         $this->expectException('TypeError');
         
-        $stub = $this->getMockForAbstractClass(BaseHandler::class);
+        $stub = $this->stub; 
 
         $stub->expects($this->any())
                  ->method('write')
@@ -45,6 +47,21 @@ class BaseHandlerTest extends TestCase
 
         $stub->log($this->logMessage1);
     }
+
+    public function testSetOptionReturnsErrorWhenWrongParams(): void
+    {
+        $this->expectException(LogException::class);
+
+        $this->stub->setOption('foo', 'bar');
+    }
+
+    public function testSetOptionReturnsTrueWhenCorrectParams(): void
+    {
+        $this->assertTrue($this->stub->setOption('ident', 'test'));
+    }
+
+
+    
 
 
 }
