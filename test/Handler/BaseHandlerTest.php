@@ -36,6 +36,11 @@ class BaseHandlerTest extends TestCase
         $this->constraint_filter = new ConstraintFilter();
     }
 
+    /**
+     * Note: This tests the following:
+     * - that log() passes the logMessage1 to the write() function
+     * - that write() returns a boolean
+     */
     public function testAbstractWriteFunctionsMustReturnBool(): void
     {
         $this->expectException('TypeError');
@@ -46,7 +51,7 @@ class BaseHandlerTest extends TestCase
                  ->method('write')
                  ->will($this->returnValue(null));
 
-        $stub->write($this->logMessage1);
+        $stub->log($this->logMessage1);
     }
 
     public function testSetOptionReturnsErrorWhenWrongParams(): void
