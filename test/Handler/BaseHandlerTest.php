@@ -15,7 +15,7 @@
 
 namespace Horde\Log\Test\Handler;
 
-use Horde\Log\Handler\StreamHandler;
+use Horde\Log\Handler\BaseHandler;
 use PHPUnit\Framework\TestCase;
 use Horde\Log\LogHandler;
 use Horde\Log\LogException;
@@ -23,7 +23,7 @@ use Horde_Log;
 use Horde\Log\LogMessage;
 use Horde\Log\LogLevel;
 
-class StreamHandlerTest extends TestCase
+class BaseHandlerTest extends TestCase
 {
     public function setUp(): void
     {
@@ -33,6 +33,18 @@ class StreamHandlerTest extends TestCase
         $this->logMessage1 = new LogMessage($this->level1, $this->message1, ['timestamp' => date('c')]);
     }
 
+    public function testAbstractWriteFunctionsMustReturnBool(): void
+    {
+        $this->expectException('TypeError');
+        
+        $stub = $this->getMockForAbstractClass(BaseHandler::class);
 
-    
+        $stub->expects($this->any())
+                 ->method('write')
+                 ->will($this->returnValue(null));
+
+        $stub->log($this->logMessage1);
+    }
+
+
 }
