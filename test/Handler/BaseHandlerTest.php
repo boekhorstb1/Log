@@ -17,31 +17,32 @@ namespace Horde\Log\Test\Handler;
 
 use Horde\Log\Handler\BaseHandler;
 use PHPUnit\Framework\TestCase;
-use Horde\Log\LogHandler;
 use Horde\Log\LogException;
 use Horde_Log;
 use Horde\Log\LogMessage;
 use Horde\Log\LogLevel;
+use Horde\Log\Filter\ConstraintFilter;
 
 class BaseHandlerTest extends TestCase
 {
     public function setUp(): void
     {
-        date_default_timezone_set('America/New_York');
+        $this->stub = $this->getMockForAbstractClass(BaseHandler::class);
+
         $this->level1 = new LogLevel(Horde_Log::ALERT, 'Alert');
         $this->message1 = 'this is an emergency!';
-        $this->logMessage1 = new LogMessage($this->level1, $this->message1, ['timestamp' => date('c')]);
+        $this->logMessage1 = new LogMessage($this->level1, $this->message1, ['randomfield' => 'stuff']);
 
-        $this->stub = $this->getMockForAbstractClass(BaseHandler::class);
+        $this->constraint_filter = new ConstraintFilter();
     }
 
-    public function testAbstractWriteFunctionsMustReturnBool(): void 
+    public function testAbstractWriteFunctionsMustReturnBool(): void
     {
         $this->expectException('TypeError');
-        
-        $stub = $this->stub; 
 
-        $stub->expects($this->any())
+        $stub = $this->stub;
+
+        $stub->expects($this->once())
                  ->method('write')
                  ->will($this->returnValue(null));
 
@@ -61,7 +62,11 @@ class BaseHandlerTest extends TestCase
     }
 
 
-    
-
-
+    /**
+     * @doesNotPerformAssertions
+     */
+    public function testFiltersAreAdded(): void
+    {
+        $this->stub->addFilter($this->constraint_filter);
+    }
 }
