@@ -16,17 +16,10 @@
 namespace Horde\Log\Test\Handler;
 
 use Horde\Log\Handler\StreamHandler;
-
-use Horde_Cli;
-use Horde\Log\Formatter\CliFormatter;
-use Horde\Log\Formatter\SimpleFormatter;
-
 use PHPUnit\Framework\TestCase;
-
 use Horde\Log\LogHandler;
 use Horde\Log\LogException;
 use Horde_Log;
-
 use Horde\Log\LogMessage;
 use Horde\Log\LogLevel;
 
