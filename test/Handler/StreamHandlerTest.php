@@ -42,9 +42,9 @@ class StreamHandlerTest extends TestCase
 
     public function testConstructorThrowsWhenResourceIsNotStream()
     {
-        $this->expectException('Error'); # for some reason LogException::class is not working here
+        $this->expectException(LogException::class);
         $resource = xml_parser_create();
-        new StreamHandler((string) $resource);
+        new StreamHandler($resource);
         xml_parser_free($resource);
     }
 
