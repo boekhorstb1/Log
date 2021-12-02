@@ -56,7 +56,7 @@ class StreamHandlerTest extends TestCase
 
     public function testConstructorThrowsWhenStreamCannotBeOpened()
     {
-        $this->expectException('Error');
+        $this->expectException(LogException::class);
         new StreamHandler('');
     }
 
