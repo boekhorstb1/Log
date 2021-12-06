@@ -22,7 +22,7 @@ use Horde_Log;
 use Horde\Log\LogMessage;
 use Horde\Log\LogLevel;
 
-class NullTest extends TestCase
+class NullHandlerTest extends TestCase
 {
     public function testWrite()
     {
