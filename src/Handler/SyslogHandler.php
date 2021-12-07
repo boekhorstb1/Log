@@ -93,7 +93,7 @@ class SyslogHandler extends BaseHandler
         if (!is_string($this->lastIdent)) {
             throw new LogException('Please set the indent to a String');
         }
-        if (!is_int($this->options['openlogOptions'])) {
+        if (!is_int($this->options->openLogOptions)) {
             throw new LogException('Please set the openlogOptions to a log constant with integer value (e.g. LOG_PERROR). For more information look at PHP documentation about openlog() and its options parameter');
         }
 

@@ -38,6 +38,7 @@ class SyslogHandlerTest extends TestCase
     # Error: Cannot use object of type Horde\Log\Handler\SyslogOptions as array
     public function testWrite()
     {
+        $this->logMessage1->formatMessage([]);
         $this->assertTrue($this->syshandler->write($this->logMessage1));
     }
 }
