@@ -33,9 +33,9 @@ class SyslogHandlerTest extends TestCase
         $this->message1 = 'this is an emergency!';
         $this->logMessage1 = new LogMessage($this->level1, $this->message1, ['timestamp' => date('c')]);
         $this->syshandler = new SyslogHandler();
-        // $this->syslogoptions = new SyslogOptions();
     }
 
+    # Error: Cannot use object of type Horde\Log\Handler\SyslogOptions as array
     public function testWrite()
     {
         $this->assertTrue($this->syshandler->write($this->logMessage1));
