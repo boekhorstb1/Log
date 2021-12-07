@@ -34,7 +34,7 @@ class SyslogHandlerTest extends TestCase
         $this->syshandler = new SyslogHandler();
     }
 
-    # Currently, a log message needs to be formatted beforehand, should this be included in the write() function?
+    # Currently, a log message needs to be formatted beforehand, should this be included in the write() function? Or should an error be thrown here indicating that the message thousl be formatted?
     public function testIfMessageIsFormatted(): void
     {
         $this->expectException('Error');
@@ -65,5 +65,11 @@ class SyslogHandlerTest extends TestCase
         $this->syshandler->setOption('ident', 'some error message');
         $this->syshandler->setOption('openlogOptions', 'this should be a log constant or at least an integer');
         $this->syshandler->write($this->logMessage1);
+    }
+
+    # I have not found a way to make the function syslog() within the if-satement of the write()-method... that would be needed to test the errormessages
+    public function testSysLogErrorThrows()
+    {
+        $this->markTestSkipped('should be revisited?');
     }
 }
