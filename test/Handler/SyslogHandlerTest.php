@@ -31,14 +31,21 @@ class SyslogHandlerTest extends TestCase
         $this->level1 = new LogLevel(Horde_Log::ALERT, 'Alert');
         $this->message1 = 'this is an emergency!';
         $this->logMessage1 = new LogMessage($this->level1, $this->message1, ['timestamp' => date('c')]);
-        $this->logMessage1->formatMessage([]);
-
         $this->syshandler = new SyslogHandler();
-        // $this->mock_syshandler = $this->getAccessibleMock(SyslogHandler::class);
+    }
+
+    # Currently, a log message needs to be formatted beforehand, should this be included in the write() function?
+    public function testIfMessageIsFormatted(): void
+    {
+        $this->expectException('Error');
+        $this->syshandler->setOption('ident', 'Message to terminal" ');
+        $this->syshandler->setOption('openlogOptions', LOG_PERROR);
+        $this->syshandler->write($this->logMessage1);
     }
 
     public function testWrite(): void
     {
+        $this->logMessage1->formatMessage([]);
         $this->syshandler->setOption('ident', 'Where is this log written to? A yes, tot the terminal beacause of "LOG_PERROR" ');
         $this->syshandler->setOption('openlogOptions', LOG_PERROR);
         $this->assertTrue($this->syshandler->write($this->logMessage1));
