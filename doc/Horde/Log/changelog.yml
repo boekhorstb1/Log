@@ -1,5 +1,5 @@
 ---
-3.0.0alpha5:
+3.0.0alpha6:
   api: 3.0.0alpha1
   state:
     release: alpha
@@ -10,6 +10,18 @@
     uri: http://www.horde.org/licenses/bsd
   notes: |+
     
+3.0.0alpha5:
+  api: 3.0.0alpha1
+  state:
+    release: alpha
+    api: alpha
+  date: 2021-03-13
+  license:
+    identifier: BSD-2-Clause
+    uri: http://www.horde.org/licenses/bsd
+  notes: |
+    [rla] Turned LogHandler options into classes.
+    |+
 3.0.0alpha4:
   api: 3.0.0alpha1
   state:
