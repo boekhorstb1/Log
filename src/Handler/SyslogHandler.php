@@ -1,6 +1,6 @@
 <?php
 /**
- * Horde Log package.
+ * Horde Log package
  *
  * @author     Mike Naberezny <mike@maintainable.com>
  * @author     Chuck Hagenbuch <chuck@horde.org>
@@ -28,18 +28,14 @@ use Horde\Log\LogException;
  */
 class SyslogHandler extends BaseHandler
 {
+    use SetOptionsTrait;
     /**
      * Options to be set by setOption().
      * Sets openlog and syslog options.
      *
-     * @var mixed[]
+     * @var SyslogOptions
      */
-    protected $options = [
-        'defaultPriority'  => LOG_ERR,
-        'facility'         => LOG_USER,
-        'ident'            => false,
-        'openlogOptions'   => false,
-    ];
+    protected SyslogOptions $options;
 
     /**
      * Last ident set by a syslog-handler instance.
@@ -51,9 +47,16 @@ class SyslogHandler extends BaseHandler
     /**
      * Last facility name set by a syslog-handler instance.
      *
-     * @var string
+     * @var int
      */
-    protected $lastFacility;
+    protected int $lastFacility;
+
+    public function __construct(SyslogOptions $options = null, array $formatters = [], array $filters = [])
+    {
+        $this->options = $options ?? new SyslogOptions();
+        $this->formatters = $formatters;
+        $this->filters = $filters;
+    }
 
     /**
      * Write a message to the log.
@@ -65,8 +68,8 @@ class SyslogHandler extends BaseHandler
      */
     public function write(LogMessage $event): bool
     {
-        if (($this->options['ident'] !== $this->lastIdent) ||
-            ($this->options['facility'] !== $this->lastFacility)) {
+        if (($this->options->ident !== $this->lastIdent) ||
+            ($this->options->facility !== $this->lastFacility)) {
             $this->initializeSyslog();
         }
 
@@ -84,8 +87,8 @@ class SyslogHandler extends BaseHandler
      */
     protected function initializeSyslog(): void
     {
-        $this->lastIdent = $this->options['ident'];
-        $this->lastFacility = $this->options['facility'];
+        $this->lastIdent = $this->options->ident;
+        $this->lastFacility = $this->options->facility;
 
         if (!is_string($this->lastIdent)) {
             throw new LogException('Please set the indent to a String');
@@ -94,7 +97,7 @@ class SyslogHandler extends BaseHandler
             throw new LogException('Please set the openlogOptions to a log constant with integer value (e.g. LOG_PERROR). For more information look at PHP documentation about openlog() and its options parameter');
         }
 
-        if (!openlog($this->options['ident'], $this->options['openlogOptions'], $this->options['facility'])) {
+        if (!openlog($this->options->ident, $this->options->openLogOptions, $this->options->facility)) {
             throw new LogException('Unable to open syslog');
         }
     }
