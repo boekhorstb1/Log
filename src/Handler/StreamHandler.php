@@ -1,6 +1,6 @@
 <?php
 /**
- * Horde Log package.
+ * Horde Log package
  *
  * This package is based on Zend_Log from the Zend Framework
  * (http://framework.zend.com).  Both that package and this
@@ -34,6 +34,9 @@ use Horde\Log\LogException;
  */
 class StreamHandler extends BaseHandler
 {
+    use SetOptionsTrait;
+    private Options $options;
+
     /**
      * Holds the PHP stream to log to.
      *
@@ -56,7 +59,7 @@ class StreamHandler extends BaseHandler
     protected $streamOrUrl;
 
     /**
-     * Class Constructor.
+     * Class Constructor
      *
      * @param mixed $streamOrUrl              Stream or URL to open as a
      *                                        stream.
@@ -69,11 +72,22 @@ class StreamHandler extends BaseHandler
     public function __construct(
         $streamOrUrl,
         $mode = 'a+',
+        Options $options = null,
         array $formatters = null
-    ) {
+    )
+    {
+        $this->options = $options ?? new Options();
         $this->formatters = $formatters ?? [new SimpleFormatter()];
         $this->mode = $mode;
         $this->streamOrUrl = $streamOrUrl;
+
+        if (is_a($streamOrUrl, 'XMLParser')) {
+            throw new LogException(__CLASS__ . ': As of php8 XMLparser returns and Object and not a string. Please adapt your stream to the correct string.');
+        }
+
+        if (is_string($streamOrUrl) && (strlen($streamOrUrl) === 0)) {
+            throw new LogException(__CLASS__ . ': Path cannot be empty.');
+        }
 
         if (is_resource($streamOrUrl)) {
             if (get_resource_type($streamOrUrl) != 'stream') {
@@ -83,6 +97,7 @@ class StreamHandler extends BaseHandler
             if ($mode && $mode != 'a+') {
                 throw new LogException(__CLASS__ . ': Mode cannot be changed on existing streams');
             }
+
 
             $this->stream = $streamOrUrl;
         } else {
@@ -114,10 +129,9 @@ class StreamHandler extends BaseHandler
     public function write(LogMessage $event): bool
     {
         $message = $event->formattedMessage();
-        if (!empty($this->options['ident'])) {
-            $message = $this->options['ident'] . ' ' . $message;
+        if (!empty($this->options->ident)) {
+            $message = $this->options->ident . ' ' . $message;
         }
-
         if (!is_resource($this->stream)) {
             throw new LogException(__CLASS__ . ': Unable to write, no stream opened');
         }
