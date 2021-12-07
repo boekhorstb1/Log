@@ -16,6 +16,7 @@
 namespace Horde\Log\Test\Handler;
 
 use Horde\Log\Handler\SyslogHandler;
+use Horde\Log\Handler\SyslogOptions;
 use PHPUnit\Framework\TestCase;
 use Horde\Log\LogHandler;
 use Horde\Log\LogException;
@@ -32,44 +33,11 @@ class SyslogHandlerTest extends TestCase
         $this->message1 = 'this is an emergency!';
         $this->logMessage1 = new LogMessage($this->level1, $this->message1, ['timestamp' => date('c')]);
         $this->syshandler = new SyslogHandler();
+        // $this->syslogoptions = new SyslogOptions();
     }
 
-    # Currently, a log message needs to be formatted beforehand, should this be included in the write() function? Or should an error be thrown here indicating that the message thousl be formatted?
-    public function testIfMessageIsFormatted(): void
+    public function testWrite()
     {
-        $this->expectException('Error');
-        $this->syshandler->setOption('ident', 'Message to terminal" ');
-        $this->syshandler->setOption('openlogOptions', LOG_PERROR);
-        $this->syshandler->write($this->logMessage1);
-    }
-
-    public function testWrite(): void
-    {
-        $this->logMessage1->formatMessage([]);
-        $this->syshandler->setOption('ident', 'Where is this log written to? A yes, tot the terminal beacause of "LOG_PERROR" ');
-        $this->syshandler->setOption('openlogOptions', LOG_PERROR);
         $this->assertTrue($this->syshandler->write($this->logMessage1));
-    }
-
-    public function testIndentErrorInitializeSyslog(): void
-    {
-        $this->expectException(LogException::class);
-        $this->syshandler->setOption('ident', 2);
-        $this->syshandler->setOption('openlogOptions', 1);
-        $this->syshandler->write($this->logMessage1);
-    }
-
-    public function testOptionsErrorInitializeSyslog(): void
-    {
-        $this->expectException(LogException::class);
-        $this->syshandler->setOption('ident', 'some error message');
-        $this->syshandler->setOption('openlogOptions', 'this should be a log constant or at least an integer');
-        $this->syshandler->write($this->logMessage1);
-    }
-
-    # I have not found a way to make the function syslog() within the if-satement of the write()-method... that would be needed to test the errormessages
-    public function testSysLogErrorThrows()
-    {
-        $this->markTestSkipped('should be revisited?');
     }
 }
