@@ -16,15 +16,11 @@
 namespace Horde\Log\Test\Handler;
 
 use Horde\Log\Handler\SyslogHandler;
-use Horde\Log\Handler\SyslogOptions;
 use PHPUnit\Framework\TestCase;
-use Horde\Log\LogHandler;
 use Horde\Log\LogException;
 use Horde_Log;
 use Horde\Log\LogMessage;
 use Horde\Log\LogLevel;
-
-// use SetOptionsTrait;
 
 class SyslogHandlerTest extends TestCase
 {
