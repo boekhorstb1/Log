@@ -31,14 +31,32 @@ class SyslogHandlerTest extends TestCase
         $this->level1 = new LogLevel(Horde_Log::ALERT, 'Alert');
         $this->message1 = 'this is an emergency!';
         $this->logMessage1 = new LogMessage($this->level1, $this->message1, ['timestamp' => date('c')]);
+        $this->logMessage1->formatMessage([]);
+
         $this->syshandler = new SyslogHandler();
+        // $this->mock_syshandler = $this->getAccessibleMock(SyslogHandler::class);
     }
 
     public function testWrite(): void
     {
-        $this->logMessage1->formatMessage([]);
         $this->syshandler->setOption('ident', 'Where is this log written to? A yes, tot the terminal beacause of "LOG_PERROR" ');
         $this->syshandler->setOption('openlogOptions', LOG_PERROR);
         $this->assertTrue($this->syshandler->write($this->logMessage1));
+    }
+
+    public function testIndentErrorInitializeSyslog(): void
+    {
+        $this->expectException(LogException::class);
+        $this->syshandler->setOption('ident', 2);
+        $this->syshandler->setOption('openlogOptions', 1);
+        $this->syshandler->write($this->logMessage1);
+    }
+
+    public function testOptionsErrorInitializeSyslog(): void
+    {
+        $this->expectException(LogException::class);
+        $this->syshandler->setOption('ident', 'some error message');
+        $this->syshandler->setOption('openlogOptions', 'this should be a log constant or at least an integer');
+        $this->syshandler->write($this->logMessage1);
     }
 }
