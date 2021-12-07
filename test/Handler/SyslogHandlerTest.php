@@ -24,6 +24,8 @@ use Horde_Log;
 use Horde\Log\LogMessage;
 use Horde\Log\LogLevel;
 
+// use SetOptionsTrait;
+
 class SyslogHandlerTest extends TestCase
 {
     public function setUp(): void
@@ -32,13 +34,35 @@ class SyslogHandlerTest extends TestCase
         $this->level1 = new LogLevel(Horde_Log::ALERT, 'Alert');
         $this->message1 = 'this is an emergency!';
         $this->logMessage1 = new LogMessage($this->level1, $this->message1, ['timestamp' => date('c')]);
+        $this->logMessage1->formatMessage([]);
         $this->syshandler = new SyslogHandler();
     }
 
-    # Error: Cannot use object of type Horde\Log\Handler\SyslogOptions as array
+    # NB: have to call formatMessage with [] as a formatter. Should this not be done in the code of Sysloghandler.php?
     public function testWrite()
     {
-        $this->logMessage1->formatMessage([]);
         $this->assertTrue($this->syshandler->write($this->logMessage1));
+    }
+
+    public function testIndentErrorInitializeSyslog(): void
+    {
+        $this->expectException(LogException::class);
+        $this->syshandler->setOption('ident', 2);
+        $this->syshandler->setOption('openlogOptions', 1);
+        $this->syshandler->write($this->logMessage1);
+    }
+
+    public function testOptionsErrorInitializeSyslog(): void
+    {
+        $this->expectException(LogException::class);
+        $this->syshandler->setOption('ident', 'some error message');
+        $this->syshandler->setOption('openlogOptions', 'this should be a log constant or at least an integer');
+        $this->syshandler->write($this->logMessage1);
+    }
+
+    # I have not found a way to make the function syslog() within the if-satement of the write()-method... that would be needed to test the errormessages
+    public function testSysLogErrorThrows()
+    {
+        $this->markTestSkipped('should be revisited?');
     }
 }
