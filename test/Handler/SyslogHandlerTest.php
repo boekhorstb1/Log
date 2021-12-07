@@ -36,13 +36,9 @@ class SyslogHandlerTest extends TestCase
 
     public function testWrite(): void
     {
-        // dd($this->logMessage1);
         $this->logMessage1->formatMessage([]);
-
-        $this->syshandler->setOption('ident', 'something');
-        $this->syshandler->setOption('openlogOptions', 1);
-
-
+        $this->syshandler->setOption('ident', 'Where is this log written to? A yes, tot the terminal beacause of "LOG_PERROR" ');
+        $this->syshandler->setOption('openlogOptions', LOG_PERROR);
         $this->assertTrue($this->syshandler->write($this->logMessage1));
     }
 }
