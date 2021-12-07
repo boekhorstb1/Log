@@ -35,14 +35,25 @@ class SyslogHandlerTest extends TestCase
         $this->message1 = 'this is an emergency!';
         $this->logMessage1 = new LogMessage($this->level1, $this->message1, ['timestamp' => date('c')]);
         $this->logMessage1->formatMessage([]);
+        $this->logMessage2 = new LogMessage($this->level1, $this->message1, ['timestamp' => date('c')]);
         $this->syshandler = new SyslogHandler();
     }
 
-    # NB: have to call formatMessage with [] as a formatter. Should this not be done in the code of Sysloghandler.php?
+
     public function testWrite()
     {
         $this->assertTrue($this->syshandler->write($this->logMessage1));
     }
+
+    # NB: have to call formatMessage with [] as a formatter. Should this not be done in the code of Sysloghandler.php?
+    public function testIfMessageIsFormatted(): void
+    {
+        $this->expectException(LogException::class);
+        $this->syshandler->setOption('ident', 'Message to terminal" ');
+        $this->syshandler->setOption('openlogOptions', LOG_PERROR);
+        $this->syshandler->write($this->logMessage2);
+    }
+
 
     public function testIndentErrorInitializeSyslog(): void
     {
