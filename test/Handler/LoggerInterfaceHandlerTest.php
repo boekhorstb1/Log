@@ -33,13 +33,6 @@ class LoggerInterfaceHandlerTest extends TestCase
         $this->message1 = 'this is an emergency!';
         $this->logMessage1 = new LogMessage($this->level1, $this->message1, ['timestamp' => date('c')]);
 
-        // not used yet but maybe later
-        $this->loglevelsss = new LogLevels();
-        $this->levels = $this->loglevelsss->initWithAliasLevels();
-        foreach ($this->levels as $level) {
-            $this->loglevelsss->register($level);
-        }
-
         $this->logging = new Logger();
         $this->loggerinterfacehandler = new LoggerInterfaceHandler($this->logging);
     }
