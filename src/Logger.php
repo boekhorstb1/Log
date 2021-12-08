@@ -101,6 +101,10 @@ class Logger implements LoggerInterface
      */
     public function unserialize($data): void
     {
+        if (!is_string($data)) {
+            throw new LogException('Serialized data should be a string. Please serialze data correctly.');
+        }
+
         $data = @unserialize($data);
         if (!is_array($data) ||
             !isset($data[0]) ||

@@ -56,4 +56,26 @@ class LoggerTest extends TestCase
         $this->assertStringContainsString('MessageFilter', $data);
         $this->assertStringContainsString('/emergency/', $data);
     }
+
+    public function testUnserialize(): void
+    {
+        $data = $this->logging->serialize();
+        $this->assertNull($this->logging->unserialize($data));
+    }
+
+    public function testErrorsUnserialize(): void
+    {
+        $data[] = ['this is not a string'];
+        $data[] = serialize('blabla');
+        $data[] = serialize([]);
+        $data[] = serialize(['another version']);
+
+        foreach ($data as $value) {
+            try {
+                $this->logging->unserialize($value);
+            } catch (\Throwable $th) {
+                $this->assertInstanceOf(LogException::class, $th);
+            }
+        }
+    }
 }
