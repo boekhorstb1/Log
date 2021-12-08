@@ -16,6 +16,7 @@
 namespace Horde\Log\Test\Handler;
 
 use Horde\Log\Handler\SyslogHandler;
+use Horde\Log\Handler\SyslogOptions;
 use PHPUnit\Framework\TestCase;
 use Horde\Log\LogException;
 use Horde_Log;
@@ -54,6 +55,14 @@ class SyslogHandlerTest extends TestCase
     {
         $this->expectException(LogException::class);
         $this->syshandler->setOption('', '');
+    }
+
+    public function testIfSyslogOptionsAreSet()
+    {
+        $options = new SyslogOptions();
+        $this->assertEquals(LOG_ERR, $options->defaultPriority);
+        $this->assertEquals(LOG_USER, $options->facility);
+        $this->assertEquals(LOG_ODELAY, $options->openLogOptions);
     }
 
 
