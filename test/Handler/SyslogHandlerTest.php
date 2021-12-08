@@ -50,6 +50,12 @@ class SyslogHandlerTest extends TestCase
         $this->syshandler->write($this->logMessage2);
     }
 
+    public function testBadOptionKeyThrowsError()
+    {
+        $this->expectException(LogException::class);
+        $this->syshandler->setOption('', '');
+    }
+
 
     public function testIndentErrorInitializeSyslog(): void
     {
@@ -67,7 +73,7 @@ class SyslogHandlerTest extends TestCase
         $this->syshandler->write($this->logMessage1);
     }
 
-    # I have not found a way to make the function syslog() within the if-satement of the write()-method... that would be needed to test the errormessages
+    # I have not found a way to make the function syslog() throw errors (it is located within the if-satement of the write()-method...). That would be needed to test the errormessages
     public function testSysLogErrorThrows()
     {
         $this->markTestSkipped('should be revisited?');
