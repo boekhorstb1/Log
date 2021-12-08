@@ -23,7 +23,9 @@ use Psr\Log\InvalidArgumentException;
 use Stringable;
 
 use Horde\Log\Filter\MessageFilter;
+use Horde\Log\Handler\MockHandler;
 use Horde\Log\Handler\SyslogHandler;
+use ReflectionClass;
 
 use Horde\Log\LogHandler;
 use Horde\Log\LogException;
@@ -44,15 +46,16 @@ class LoggerTest extends TestCase
         // not used yet but maybe later
         $this->loglevelsss = new LogLevels();
         $this->messagefilter[] = new MessageFilter('/emergency/');
-        $this->sysloghandler[] = new SyslogHandler();
+        $this->handlers[] = new MockHandler();
 
-        $this->logging = new Logger($this->sysloghandler, null, $this->messagefilter);
+
+        $this->logging = new Logger($this->handlers, null, $this->messagefilter);
     }
 
     public function testSerializeAndAddFilter(): void
     {
         $data = $this->logging->serialize();
-        $this->assertStringContainsString('SyslogHandler', $data);
+        $this->assertStringContainsString('MockHandler', $data);
         $this->assertStringContainsString('MessageFilter', $data);
         $this->assertStringContainsString('/emergency/', $data);
     }
@@ -75,6 +78,21 @@ class LoggerTest extends TestCase
                 $this->logging->unserialize($value);
             } catch (\Throwable $th) {
                 $this->assertInstanceOf(LogException::class, $th);
+            }
+        }
+    }
+
+    public function testLogMethodsWithLogMessage()
+    {
+        $methods = get_class_methods(Logger::class);
+        $reflector = new ReflectionClass(LogLevel::class);
+        $levelconstants = array_flip($reflector->getConstants());
+
+        foreach ($methods as $key => $method) {
+            if (array_key_exists($method, $levelconstants)) {
+                $this->logging->$method($this->message1);
+                $this->assertEquals($this->handlers[0]->check->message(), $this->logMessage1->message());
+                $this->assertEquals($this->handlers[0]->check->level()->name(), $method);
             }
         }
     }
