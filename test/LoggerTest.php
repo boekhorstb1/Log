@@ -93,6 +93,9 @@ class LoggerTest extends TestCase
         foreach ($methods as $key => $method) {
             if (array_key_exists($method, $loggerinterface_methods)) {
                 if ($method == 'log') {
+                    $this->logging->$method($this->level1, $this->message1);
+                    $this->assertEquals($this->handlers[0]->check->message(), $this->logMessage1->message());
+                    $this->assertEquals($this->handlers[0]->check->level()->name(), $this->logMessage1->level()->name());
                 } else {
                     $this->logging->$method($this->message1);
                     $this->assertEquals($this->handlers[0]->check->message(), $this->logMessage1->message());
