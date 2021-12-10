@@ -45,10 +45,14 @@ class LoggerTest extends TestCase
         $this->message1 = 'this is an emergency!';
         $this->logMessage1 = new LogMessage($this->level1, $this->message1, ['timestamp' => date('c')]);
 
-        // not used yet but maybe later
         $this->loglevelsss = new LogLevels();
         $this->messagefilter[] = new MessageFilter('/emergency/');
-        $this->handlers[] = new MockHandler();
+
+        $this->mockhandler1 = new MockHandler();
+        $this->mockhandler2 = new MockHandler();
+        $this->mockhandler2->addFilter(new MessageFilter('/emergency/'));
+        $this->handlers[] = $this->mockhandler1;
+        $this->handlers[] = $this->mockhandler2;
 
 
         $this->logging = new Logger($this->handlers, null, $this->messagefilter);
@@ -94,12 +98,12 @@ class LoggerTest extends TestCase
             if (array_key_exists($method, $loggerinterface_methods)) {
                 if ($method == 'log') {
                     $this->logging->$method($this->level1, $this->message1);
-                    $this->assertEquals($this->handlers[0]->check->message(), $this->logMessage1->message());
-                    $this->assertEquals($this->handlers[0]->check->level()->name(), $this->logMessage1->level()->name());
+                    $this->assertEquals($this->mockhandler1->check->message(), $this->logMessage1->message());
+                    $this->assertEquals($this->mockhandler1->check->level()->name(), $this->logMessage1->level()->name());
                 } else {
                     $this->logging->$method($this->message1);
-                    $this->assertEquals($this->handlers[0]->check->message(), $this->logMessage1->message());
-                    $this->assertEquals($this->handlers[0]->check->level()->name(), $method);
+                    $this->assertEquals($this->mockhandler1->check->message(), $this->logMessage1->message());
+                    $this->assertEquals($this->mockhandler1->check->level()->name(), $method);
                 }
             }
         }
