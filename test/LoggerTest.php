@@ -84,7 +84,7 @@ class LoggerTest extends TestCase
         }
     }
 
-    public function testLogMethodsByCheckingTheirClass()
+    public function testLogMethodsByCheckingTheirClassAndIfMockHandlerWorks()
     {
         $methods = get_class_methods(Logger::class);
 
@@ -103,5 +103,22 @@ class LoggerTest extends TestCase
                 }
             }
         }
+    }
+
+    public function testStringAsMessageForLog()
+    {
+        $this->assertNull($this->logging->log($this->level1, "righty o, this should be a message for an alert warrrninggg"));
+    }
+
+    public function testLogMethodThrowsErrorIfWrongLogCode()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->logging->log(22, $this->message1);
+    }
+
+    public function testLogMethodThrowsErrorIfWrongLogLevelString()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->logging->log("nonexistant level", $this->message1);
     }
 }
