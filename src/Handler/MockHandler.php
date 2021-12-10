@@ -83,6 +83,7 @@ class MockHandler extends BaseHandler
         // If any local filter rejects the message, don't log it.
         foreach ($this->filters as $filter) {
             if (!$filter->accept($event)) {
+                $this->check = "filtered out";
                 return;
             }
         }

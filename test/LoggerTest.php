@@ -43,14 +43,16 @@ class LoggerTest extends TestCase
         date_default_timezone_set('America/New_York');
         $this->level1 = new LogLevel(Horde_Log::ALERT, 'Alert');
         $this->message1 = 'this is an emergency!';
+        $this->message2 = 'this is a polar bear!';
         $this->logMessage1 = new LogMessage($this->level1, $this->message1, ['timestamp' => date('c')]);
+        $this->logMessage2 = new LogMessage($this->level1, $this->message2);
 
         $this->loglevelsss = new LogLevels();
         $this->messagefilter[] = new MessageFilter('/emergency/');
 
         $this->mockhandler1 = new MockHandler();
         $this->mockhandler2 = new MockHandler();
-        $this->mockhandler2->addFilter(new MessageFilter('/emergency/'));
+        $this->mockhandler2->addFilter(new MessageFilter('/notwokringregexpattern/'));
         $this->handlers[] = $this->mockhandler1;
         $this->handlers[] = $this->mockhandler2;
 
@@ -64,6 +66,15 @@ class LoggerTest extends TestCase
         $this->assertStringContainsString('MockHandler', $data);
         $this->assertStringContainsString('MessageFilter', $data);
         $this->assertStringContainsString('/emergency/', $data);
+    }
+
+    public function testSerializeAndAddHandler(): void
+    {
+        $mockhandler3 = new MockHandler();
+        $mockhandler3->addFilter(new MessageFilter('/whazzaaa/'));
+        $this->logging->addHandler($mockhandler3);
+        $data = $this->logging->serialize();
+        $this->assertStringContainsString('/whazzaaa/', $data);
     }
 
     public function testUnserialize(): void
@@ -112,6 +123,14 @@ class LoggerTest extends TestCase
     public function testStringAsMessageForLog()
     {
         $this->assertNull($this->logging->log($this->level1, "righty o, this should be a message for an alert warrrninggg"));
+    }
+
+    public function testFiltersOfLoggerWorkWithoutMockHandlerFilter()
+    {
+        $this->mockhandler2->log($this->logMessage1);
+        $this->assertEquals('filtered out', $this->mockhandler2->check);
+        $this->logging->log($this->level1, $this->message1);
+        $this->assertEquals('filtered out', $this->mockhandler2->check);
     }
 
     public function testLogMethodThrowsErrorIfWrongLogCode()
