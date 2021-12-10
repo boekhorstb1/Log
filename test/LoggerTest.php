@@ -18,6 +18,8 @@ namespace Horde\Log\Test;
 use Horde\Log\Logger;
 use PHPUnit\Framework\TestCase;
 
+use Psr\Log\LoggerInterface;
+
 use Horde\Util\HordeString;
 use Psr\Log\InvalidArgumentException;
 use Stringable;
@@ -82,17 +84,20 @@ class LoggerTest extends TestCase
         }
     }
 
-    public function testLogMethodsWithLogMessage()
+    public function testLogMethodsByCheckingTheirClass()
     {
         $methods = get_class_methods(Logger::class);
-        $reflector = new ReflectionClass(LogLevel::class);
-        $levelconstants = array_flip($reflector->getConstants());
+
+        $loggerinterface_methods = array_flip(get_class_methods(LoggerInterface::class));
 
         foreach ($methods as $key => $method) {
-            if (array_key_exists($method, $levelconstants)) {
-                $this->logging->$method($this->message1);
-                $this->assertEquals($this->handlers[0]->check->message(), $this->logMessage1->message());
-                $this->assertEquals($this->handlers[0]->check->level()->name(), $method);
+            if (array_key_exists($method, $loggerinterface_methods)) {
+                if ($method == 'log') {
+                } else {
+                    $this->logging->$method($this->message1);
+                    $this->assertEquals($this->handlers[0]->check->message(), $this->logMessage1->message());
+                    $this->assertEquals($this->handlers[0]->check->level()->name(), $method);
+                }
             }
         }
     }
