@@ -70,7 +70,7 @@ class LogLevelsTest extends TestCase
         $initWithAliasLevels = $this->loglevels->initWithAliasLevels();
         $initWithCanonicalLevels = $this->loglevels->initWithCanonicalLevels();
 
-        // the $levelNames array has the criticallity in the key and the names and aliases as value
+
         $levelNamesCannonical = [
             0 => 'emergency',
             1 => 'alert',
