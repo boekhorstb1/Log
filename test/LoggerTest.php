@@ -157,7 +157,10 @@ class LoggerTest extends TestCase
 
     public function testStringAsMessageForLog()
     {
-        $this->assertNull($this->logging->log($this->level1, "righty o, this should be a message for an alert warrrninggg"));
+        // Because the default Logger (see SetUp()) uses the handler mockhandler1 and a filter with "emergency", mockhandler1 will log a message if the Loggers ->log() method is called with "emergency" in it
+        $message = "emergency: this is a a message for an emergency!";
+        $this->logging->log($this->level1, $message);
+        $this->assertEquals($this->mockhandler1->check->message(), $message);
     }
 
     public function testFiltersOfLoggerWorkWithoutMockHandlerFilter()
