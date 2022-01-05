@@ -79,24 +79,51 @@ class LoggerTest extends TestCase
 
     public function testUnserialize(): void
     {
-        $data = $this->logging->serialize();
-        $this->assertNull($this->logging->unserialize($data));
+        // message that should be filtered out
+        $level = new LogLevel(Horde_Log::ALERT, 'Alert');
+        $message1 = 'this message will not be logged because the MessageFilter will remove it';
+        $message2 = 'buzzword testUnserialize, this message will be logged successfully';
+        $logger = new Logger();
+
+        // test serializing if default logger (the one set in SeTup()) contains filter and handler
+        $mockhandler4 = new MockHandler();
+        $mockhandler4->addFilter(new MessageFilter('/testUnserialize/'));
+        $logger->addHandler($mockhandler4);
+        $data = $logger->serialize();
+        $this->assertStringContainsString('/testUnserialize/', $data);
+
+        // unserialize data, serialize it again and check if message1 is filtered out correctly and message2 is logged correctly
+        $newlogger = new Logger();
+        $newlogger->unserialize($data);
+        $newlogger->log($level, $message1);
+        $newdata = $newlogger->serialize();
+        $this->assertStringContainsString('filtered out', $newdata);
+        $newlogger->log($level, $message2);
+        $newdata = $newlogger->serialize();
+        $this->assertStringContainsString('successfully', $newdata);
     }
 
     public function testErrorsUnserialize(): void
     {
+        // list of wrong data that is serialized
         $data[] = ['this is not a string'];
         $data[] = serialize('blabla');
         $data[] = serialize([]);
         $data[] = serialize(['another version']);
+        $count = 0;
 
+        // test that all wrong data will throw errors
         foreach ($data as $value) {
             try {
                 $this->logging->unserialize($value);
             } catch (\Throwable $th) {
+                $count++;
                 $this->assertInstanceOf(LogException::class, $th);
             }
         }
+
+        // the amount of throws needs the equal the lenght of the array data[]
+        $this->assertEquals(count($data), $count);
     }
 
     public function testLogMethodsByCheckingTheirClassAndIfMockHandlerWorks()
