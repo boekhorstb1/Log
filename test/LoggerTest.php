@@ -126,23 +126,31 @@ class LoggerTest extends TestCase
         $this->assertEquals(count($data), $count);
     }
 
-    public function testLogMethodsByCheckingTheirClassAndIfMockHandlerWorks()
+    public function testAllLogMethods()
     {
-        $methods = get_class_methods(Logger::class);
+        // creating new logger with mockhandler and MessageFilter
+        $mockhandler1 = new MockHandler();
+        $mockhandler1->addFilter(new MessageFilter('/logmethodscheck/'));
+        $handlers[] = $mockhandler1;
+        $logger = new Logger($handlers);
 
-        $loggerinterface_methods = array_flip(get_class_methods(LoggerInterface::class));
+        // create some messages and levels
+        $level1 = new LogLevel(Horde_Log::ALERT, 'Alert');
+        $message1 = 'this is a valid message for logmethodscheck';
 
-        foreach ($methods as $key => $method) {
-            if (array_key_exists($method, $loggerinterface_methods)) {
-                if ($method == 'log') {
-                    $this->logging->$method($this->level1, $this->message1);
-                    $this->assertEquals($this->mockhandler1->check->message(), $this->logMessage1->message());
-                    $this->assertEquals($this->mockhandler1->check->level()->name(), $this->logMessage1->level()->name());
-                } else {
-                    $this->logging->$method($this->message1);
-                    $this->assertEquals($this->mockhandler1->check->message(), $this->logMessage1->message());
-                    $this->assertEquals($this->mockhandler1->check->level()->name(), $method);
-                }
+        // get all the methods fromt the LoggerInterface::class, put them in array (so we have all relevant methods of Logger:class in an array)
+        $loggerinterface_methods = get_class_methods(LoggerInterface::class);
+
+        // check for each method that the correct name, message and level are set. Because $mockhandler1 is loaded into $logger, $mockhandler1->check should be same as what is being logged through $logger->log($somelevel, $somemessage)
+        foreach ($loggerinterface_methods as $key => $method) {
+            if ($method == 'log') {
+                $logger->$method($level1, "logmethodscheck: for the log method");
+                $this->assertEquals($mockhandler1->check->message(), "logmethodscheck: for the log method");
+                $this->assertEquals($mockhandler1->check->level()->name(), $level1->name());
+            } else {
+                $logger->$method($message1);
+                $this->assertEquals($mockhandler1->check->message(), $message1);
+                $this->assertEquals($mockhandler1->check->level()->name(), $method);
             }
         }
     }
