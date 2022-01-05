@@ -51,10 +51,7 @@ class LoggerTest extends TestCase
         $this->messagefilter[] = new MessageFilter('/emergency/');
 
         $this->mockhandler1 = new MockHandler();
-        $this->mockhandler2 = new MockHandler();
-        $this->mockhandler2->addFilter(new MessageFilter('/notwokringregexpattern/'));
         $this->handlers[] = $this->mockhandler1;
-        $this->handlers[] = $this->mockhandler2;
 
 
         $this->logging = new Logger($this->handlers, null, $this->messagefilter);
@@ -165,10 +162,24 @@ class LoggerTest extends TestCase
 
     public function testFiltersOfLoggerWorkWithoutMockHandlerFilter()
     {
-        $this->mockhandler2->log($this->logMessage1);
-        $this->assertEquals('filtered out', $this->mockhandler2->check);
-        $this->logging->log($this->level1, $this->message1);
-        $this->assertEquals('filtered out', $this->mockhandler2->check);
+        // define logger that loads mockhandlers
+        $mockhandlerWihtoutFilter = new MockHandler();
+        $messagefilter[] = new MessageFilter('/filter this out/');
+        $handlers[] = $mockhandlerWihtoutFilter;
+        $logger = new Logger($handlers, null, $messagefilter);
+
+        // random messages
+        $message1 = "this will not be added by Logger, but will be added by Mockhandler without logger";
+        $logMessage1 = new LogMessage($this->level1, $message1);
+
+        // $message1 is filtered out by the logger
+        $logger->log($this->level1, $message1);
+        $data = $logger->serialize();
+        $this->assertStringNotContainsString($data, $message1);
+
+        // $message1 is not filtered out by the mockhandler
+        $mockhandlerWihtoutFilter->log($logMessage1);
+        $this->assertEquals($message1, $mockhandlerWihtoutFilter->check->message());
     }
 
     public function testLogMethodThrowsErrorIfWrongLogCode()
