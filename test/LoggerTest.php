@@ -76,20 +76,20 @@ class LoggerTest extends TestCase
 
     public function testUnserialize(): void
     {
-        // message that should be filtered out
+        // Create the message that should be filtered out and a first logger
         $level = new LogLevel(Horde_Log::ALERT, 'Alert');
         $message1 = 'this message will not be logged because the MessageFilter will remove it';
-        $message2 = 'buzzword testUnserialize, this message will be logged successfully';
+        $message2 = 'buzzword: testUnserialize, this message will be logged successfully';
         $logger = new Logger();
 
-        // test serializing if default logger (the one set in SeTup()) contains filter and handler
+        // test if serialized instance of logger contains filter and handler
         $mockhandler4 = new MockHandler();
         $mockhandler4->addFilter(new MessageFilter('/testUnserialize/'));
         $logger->addHandler($mockhandler4);
         $data = $logger->serialize();
         $this->assertStringContainsString('/testUnserialize/', $data);
 
-        // unserialize data, serialize it again and check if message1 is filtered out correctly and message2 is logged correctly
+        // unserialize data with a new logger, serialize it again and check if message1 is filtered out correctly and message2 is logged correctly
         $newlogger = new Logger();
         $newlogger->unserialize($data);
         $newlogger->log($level, $message1);
@@ -109,7 +109,7 @@ class LoggerTest extends TestCase
         $data[] = serialize(['another version']);
         $count = 0;
 
-        // test that all wrong data will throw errors
+        // test that all array-entries have wrong data and throw errors
         foreach ($data as $value) {
             try {
                 $this->logging->unserialize($value);
@@ -119,13 +119,18 @@ class LoggerTest extends TestCase
             }
         }
 
-        // the amount of throws needs the equal the lenght of the array data[]
+        // the amount of throws needs to be equal to the lenght of the array data[]
         $this->assertEquals(count($data), $count);
     }
 
+    /*
+    * Test all the log methods of the logger
+    * - Uses a new instance of a logger
+    * - uses get_class_methods(LoggerInterface::class) to load implementes log-methods of the LoggerInterface
+    */
     public function testAllLogMethods()
     {
-        // creating new logger with mockhandler and MessageFilter
+        // creating a new logger with mockhandler and MessageFilter
         $mockhandler1 = new MockHandler();
         $mockhandler1->addFilter(new MessageFilter('/logmethodscheck/'));
         $handlers[] = $mockhandler1;
@@ -135,10 +140,11 @@ class LoggerTest extends TestCase
         $level1 = new LogLevel(Horde_Log::ALERT, 'Alert');
         $message1 = 'this is a valid message for logmethodscheck';
 
-        // get all the methods fromt the LoggerInterface::class, put them in array (so we have all relevant methods of Logger:class in an array)
+        // put all the methods fromt the LoggerInterface::class in an array
         $loggerinterface_methods = get_class_methods(LoggerInterface::class);
 
-        // check for each method that the correct name, message and level are set. Because $mockhandler1 is loaded into $logger, $mockhandler1->check should be same as what is being logged through $logger->log($somelevel, $somemessage)
+        // check for each method that the correct name, message and level are set.
+        // Because $mockhandler1 is loaded into $logger, $mockhandler1->check should containt what is logged through $logger->log($somelevel, $somemessage)
         foreach ($loggerinterface_methods as $key => $method) {
             if ($method == 'log') {
                 $logger->$method($level1, "logmethodscheck: for the log method");
@@ -152,14 +158,27 @@ class LoggerTest extends TestCase
         }
     }
 
+    /*
+    * Test if the log() function can pass a string instead of an instance of LogMessage or Stringable
+    * - Uses the default Logger (in SetUp()).
+    *
+    * Note:
+    * - default Logger uses a mockhandler1 and an additional filter with "emergency"
+    * - mockhandler1 will log a message if the $this->logging->log() method is called with "emergency" in it
+    * - mockhandler1->check will not hold the value "filtered out" because the filter is defined in the logger not in the handler
+    */
     public function testStringAsMessageForLog()
     {
-        // Because the default Logger (see SetUp()) uses the handler mockhandler1 and a filter with "emergency", mockhandler1 will log a message if the Loggers ->log() method is called with "emergency" in it
         $message = "emergency: this is a a message for an emergency!";
         $this->logging->log($this->level1, $message);
         $this->assertEquals($this->mockhandler1->check->message(), $message);
     }
 
+    /*
+    * Test if the log() function can use its own filters independently of the mockhandlers filters
+    * - Uses two new loggers: $logger and $newlogger
+    *
+    */
     public function testFiltersOfLoggerWorkWithoutMockHandlerFilter()
     {
         // define logger that loads mockhandlers
