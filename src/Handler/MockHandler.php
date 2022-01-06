@@ -1,6 +1,6 @@
 <?php
 /**
- * Horde Log package.
+ * Horde Log package
  *
  * This package is based on Zend_Log from the Zend Framework
  * (http://framework.zend.com).  Both that package and this
@@ -32,6 +32,19 @@ use Horde\Log\LogException;
  */
 class MockHandler extends BaseHandler
 {
+    use SetOptionsTrait;
+    private Options $options;
+
+    /**
+     * Check variables used for testing
+     *
+     */
+    public $check;
+
+    public function __construct(Options $options = null)
+    {
+        $this->options = $options ?? new Options();
+    }
     /**
      * Log events.
      *
@@ -54,11 +67,32 @@ class MockHandler extends BaseHandler
     public function write(LogMessage $event): bool
     {
         $this->events[] = $event;
+        $this->check = $event;
         return true;
     }
 
     /**
-     * Record shutdown.
+     * Log a message to this handler.
+     *
+     * Check all filters and expand it before delegating to the write method
+     *
+     * @param LogMessage $event  Log event.
+     */
+    public function log(LogMessage $event): void
+    {
+        // If any local filter rejects the message, don't log it.
+        foreach ($this->filters as $filter) {
+            if (!$filter->accept($event)) {
+                $this->check = "filtered out";
+                return;
+            }
+        }
+        $event->formatMessage($this->formatters);
+        $this->write($event);
+    }
+
+    /**
+     * Record shutdown
      */
     public function shutdown(): void
     {

@@ -23,6 +23,7 @@ use Horde_Log;
 use Horde\Log\LogMessage;
 use Horde\Log\LogLevel;
 use Horde\Log\Filter\ConstraintFilter;
+use Horde\Log\Filter\MessageFilter;
 
 class BaseHandlerTest extends TestCase
 {
@@ -46,7 +47,7 @@ class BaseHandlerTest extends TestCase
      * - that log() passes the logMessage1 to the write() function
      * - that write() returns a boolean
      *
-     * NB: the write() function is teste more directly by the testmethod testAbstractWriteFunctionsWithOwnMockClass() and by NullHandlerTest.php
+     * NB: the write() function is tested more directly by the testmethod testAbstractWriteFunctionsWithOwnMockClass() and by NullHandlerTest.php
      */
     public function testAbstractWriteFunctionsMustReturnBoolWithPHPunitAbstractClass(): void
     {
@@ -85,5 +86,19 @@ class BaseHandlerTest extends TestCase
     public function testFiltersAreAdded(): void
     {
         $this->stub->addFilter($this->constraint_filter);
+    }
+
+    public function testIfLogMethodUsesFilters(): void
+    {
+        // creating a message that is NOT going to be logged
+        $level2 = new LogLevel(Horde_Log::CRITICAL, 'Critical');
+        $message2 = 'this is not going to be logged!';
+        $logMessage2 = new LogMessage($level2, $message2, ['randomfield' => 'stuff']);
+
+        // creating a message filter for the BaseHandler that will filter the defalt messages (defined in SeTup())
+        $messageFilter = new MessageFilter('/emergency/');
+        $this->stub->addFilter($messageFilter);
+        $this->stub->log($logMessage2);
+        dd($this->stub);
     }
 }
