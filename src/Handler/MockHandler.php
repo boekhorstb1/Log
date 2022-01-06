@@ -37,7 +37,7 @@ class MockHandler extends BaseHandler
 
     /**
     * Check variables used for testing
-    *
+    *  @var mixed;
     */
     public $check;
 
