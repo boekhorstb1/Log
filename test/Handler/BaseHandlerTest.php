@@ -52,9 +52,10 @@ class BaseHandlerTest extends TestCase
         $baseHandlerMock->log($this->logMessage1);
     }
 
-    public function testAbstractWriteFunctionsWithOwnMockClass()
+    public function testWriteFunctionsReturnsBoolean(): void
     {
-        $this->assertTrue($this->mockhandler->write($this->logMessage1));
+        // Note: Phpunit gives a default false as output of abstract methods
+        $this->assertFalse($this->baseHandlerMock->write($this->logMessage1));
     }
 
     public function testSetOptionReturnsErrorWhenWrongParams(): void
