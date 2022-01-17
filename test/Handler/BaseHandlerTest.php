@@ -40,7 +40,7 @@ class BaseHandlerTest extends TestCase
         $this->message1 = 'this is an emergency!';
         $this->logMessage1 = new LogMessage($this->level1, $this->message1, ['randomfield' => 'stuff']);
 
-        $this->constraint_filter = new ConstraintFilter();
+        $this->constraintFilter = new ConstraintFilter();
     }
 
     /**
@@ -86,7 +86,7 @@ class BaseHandlerTest extends TestCase
      */
     public function testFiltersAreAdded(): void
     {
-        $this->baseHandlerMock->addFilter($this->constraint_filter);
+        $this->baseHandlerMock->addFilter($this->constraintFilter);
     }
 
     public function testIfLogMethodUsesFiltersByUsingMockhandler(): void
