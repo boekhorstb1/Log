@@ -18,13 +18,11 @@ namespace Horde\Log\Test\Handler;
 use Horde\Log\Handler\BaseHandler;
 use Horde\Log\Handler\MockHandler;
 use PHPUnit\Framework\TestCase;
-use Horde\Log\LogException;
 use Horde_Log;
 use Horde\Log\LogMessage;
 use Horde\Log\LogLevel;
 use Horde\Log\Filter\ConstraintFilter;
 use Horde\Log\Filter\MessageFilter;
-use Horde\Log\Logger;
 
 class BaseHandlerTest extends TestCase
 {
@@ -57,19 +55,6 @@ class BaseHandlerTest extends TestCase
         // Note: Phpunit gives a default false as output of abstract methods
         $this->assertFalse($this->baseHandlerMock->write($this->logMessage1));
     }
-
-    public function testSetOptionReturnsErrorWhenWrongParams(): void
-    {
-        $this->expectException(LogException::class);
-
-        $this->mockhandler->setOption('foo', 'bar');
-    }
-
-    public function testSetOptionReturnsTrueWhenCorrectParams(): void
-    {
-        $this->assertTrue($this->mockhandler->setOption('ident', 'test'));
-    }
-
 
     /**
      * @doesNotPerformAssertions
