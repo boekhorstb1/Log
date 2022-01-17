@@ -31,7 +31,7 @@ class BaseHandlerTest extends TestCase
     public function setUp(): void
     {
         # Bult in Mock for abstract classes (in phpunit)
-        $this->stub = $this->getMockForAbstractClass(BaseHandler::class);
+        $this->baseHandlerMock = $this->getMockForAbstractClass(BaseHandler::class);
 
         # Own Mock class for testing the base class
         $this->mockhandler = new MockHandler();
@@ -54,13 +54,13 @@ class BaseHandlerTest extends TestCase
     {
         $this->expectException('TypeError');
 
-        $stub = $this->stub;
+        $baseHandlerMock = $this->baseHandlerMock;
 
-        $stub->expects($this->once())
+        $baseHandlerMock->expects($this->once())
                  ->method('write')
                  ->will($this->returnValue(null));
 
-        $stub->log($this->logMessage1);
+        $baseHandlerMock->log($this->logMessage1);
     }
 
     public function testAbstractWriteFunctionsWithOwnMockClass()
@@ -86,7 +86,7 @@ class BaseHandlerTest extends TestCase
      */
     public function testFiltersAreAdded(): void
     {
-        $this->stub->addFilter($this->constraint_filter);
+        $this->baseHandlerMock->addFilter($this->constraint_filter);
     }
 
     public function testIfLogMethodUsesFiltersByUsingMockhandler(): void
