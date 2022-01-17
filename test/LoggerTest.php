@@ -188,11 +188,12 @@ class LoggerTest extends TestCase
         $logger = new Logger($handlers, null, $messagefilter);
 
         // random messages
-        $message1 = "this will not be added by Logger, but will be added by Mockhandler without logger";
+        $message1 = "filter this out please, because it is important";
         $logMessage1 = new LogMessage($this->level1, $message1);
 
         // $message1 is filtered out by the logger
         $logger->log($this->level1, $message1);
+
         $data = $logger->serialize();
         $this->assertStringNotContainsString($data, $message1);
 
