@@ -87,7 +87,7 @@ class LogLevelsTest extends TestCase
             2 => 'crit',
             3 => 'err',
             4 =>  'warn',
-            6 => 'information',
+            5 => 'information',
             6 => 'informational'
         ];
 
@@ -98,16 +98,27 @@ class LogLevelsTest extends TestCase
             $this->assertEquals($bynameCanonical, $bycriticalityCannonical);
         }
 
-        // testing alias names an levels
+        // testing alias names and levels
+        $count = 0;
+
         foreach ($levelNamesAliases as $level => $alias) {
             $bynameAlias = $initWithAliasLevels->getByLevelName($alias);
-            $bycriticalityAlias =  $initWithAliasLevels->getByCriticality($level);
+
+            if ($alias == "information") {
+                $bycriticalityAlias =  $initWithAliasLevels->getByCriticality(6);
+            } else {
+                $bycriticalityAlias =  $initWithAliasLevels->getByCriticality($level);
+            }
 
             if ($bynameAlias->criticality() == 6) { // this if-else-statements are necessary because the aliases for info are longer than te cannonical names in case of info (level 6)
                 $this->assertStringContainsString($bycriticalityAlias->name(), $bynameAlias->name());
             } else {
                 $this->assertStringContainsString($bynameAlias->name(), $bycriticalityAlias->name());
             }
+            $count ++;
         }
+
+        // checking that all the aliases are passed through the function
+        $this->assertEquals(count($levelNamesAliases), $count);
     }
 }
