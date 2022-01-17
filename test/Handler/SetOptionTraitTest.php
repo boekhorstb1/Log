@@ -18,23 +18,50 @@ namespace Horde\Log\Test\Handler;
 use Horde\Log\Handler\MockHandler;
 use PHPUnit\Framework\TestCase;
 use Horde\Log\LogException;
+use Horde\Log\Handler\Options;
+use Horde\Log\Handler\SetOptionsTrait;
 
 class SetOptionTraitTest extends TestCase
 {
     public function setUp(): void
     {
+        // with mockhandler
         $this->mockhandler = new MockHandler();
+
+        // without mockhandler
+        $this->setOptionsTrait = $this->getMockForTrait(SetOptionsTrait::class);
     }
 
+    // Testing if new Options is set (without mockhandler)
+    public function testNewOptionsForSetOptionsTrait(): void
+    {
+        $this->setOptionsTrait->options = new Options();
+        $optionskey = 'ident';
+        $testOptionskey = 'test';
+        $this->setOptionsTrait->options->$optionskey = $testOptionskey;
+        $this->assertSame($this->setOptionsTrait->options->$optionskey, $testOptionskey);
+        $this->setOptionsTrait->setOption('ident', 'bla');
+        $this->assertNotSame($this->setOptionsTrait->options->$optionskey, $testOptionskey);
+    }
+
+    // Testing if new Options is set (with mockhandler)
+    public function testSetOptionReturnsTrueWhenCorrectParams(): void
+    {
+        $this->assertTrue($this->mockhandler->setOption('ident', 'test'));
+    }
+
+    // Testing if new Options throws correct errors (without mockhandler)
+    public function testSetOptionsThrowsErrors(): void
+    {
+        $this->expectException(LogException::class);
+        $this->setOptionsTrait->setOption('ident', 'bla'); // as there are no options set, setOptions will throw an error
+    }
+
+    // with mockhandler
     public function testSetOptionReturnsErrorWhenWrongParams(): void
     {
         $this->expectException(LogException::class);
 
         $this->mockhandler->setOption('foo', 'bar');
-    }
-
-    public function testSetOptionReturnsTrueWhenCorrectParams(): void
-    {
-        $this->assertTrue($this->mockhandler->setOption('ident', 'test'));
     }
 }
