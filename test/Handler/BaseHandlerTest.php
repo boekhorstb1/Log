@@ -37,16 +37,13 @@ class BaseHandlerTest extends TestCase
         $this->level1 = new LogLevel(Horde_Log::ALERT, 'Alert');
         $this->message1 = 'this is an emergency!';
         $this->logMessage1 = new LogMessage($this->level1, $this->message1, ['randomfield' => 'stuff']);
-
         $this->constraintFilter = new ConstraintFilter();
     }
 
     public function testWriteFunctionIsExecutedByLog(): void
     {
         $baseHandlerMock = $this->baseHandlerMock;
-
         $baseHandlerMock->expects($this->once())->method('write');
-
         $baseHandlerMock->log($this->logMessage1);
     }
 
@@ -90,6 +87,5 @@ class BaseHandlerTest extends TestCase
         // Check that this will not filter message2
         $mockhandler->log($logMessage2);
         $this->assertEquals($mockhandler->check, 'filtered out');
-        //$this->assertEquals($check, $logMessage1);
     }
 }

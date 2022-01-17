@@ -23,7 +23,6 @@ class SetOptionTraitTest extends TestCase
 {
     public function setUp(): void
     {
-        # Own Mock class for testing the base class
         $this->mockhandler = new MockHandler();
     }
 
