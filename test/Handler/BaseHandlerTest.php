@@ -56,7 +56,7 @@ class BaseHandlerTest extends TestCase
     /**
      * @doesNotPerformAssertions
      */
-    public function testFiltersAreAdded(): void
+    public function testFilterMethodExistsAndDoesNotFail(): void
     {
         $this->baseHandlerMock->addFilter($this->constraintFilter);
     }
