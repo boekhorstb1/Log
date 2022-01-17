@@ -90,6 +90,7 @@ class LoggerTest extends TestCase
         $this->assertStringContainsString('/testUnserialize/', $data);
 
         // unserialize data with a new logger, serialize it again and check if message1 is filtered out correctly and message2 is logged correctly
+        // - NB: the $check value in the Mockhandler is used to verify this
         $newlogger = new Logger();
         $newlogger->unserialize($data);
         $newlogger->log($level, $message1);
