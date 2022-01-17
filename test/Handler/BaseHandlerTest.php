@@ -43,22 +43,11 @@ class BaseHandlerTest extends TestCase
         $this->constraintFilter = new ConstraintFilter();
     }
 
-    /**
-     * Note: This tests the following with the Phpunit mock of abstract classes:
-     * - that log() passes the logMessage1 to the write() function
-     * - that write() returns a boolean
-     *
-     * NB: the write() function is tested more directly by the testmethod testAbstractWriteFunctionsWithOwnMockClass() and by NullHandlerTest.php
-     */
-    public function testAbstractWriteFunctionsMustReturnBoolWithPHPunitAbstractClass(): void
+    public function testWriteFunctionIsExecutedByLog(): void
     {
-        $this->expectException('TypeError');
-
         $baseHandlerMock = $this->baseHandlerMock;
 
-        $baseHandlerMock->expects($this->once())
-                 ->method('write')
-                 ->will($this->returnValue(null));
+        $baseHandlerMock->expects($this->once())->method('write');
 
         $baseHandlerMock->log($this->logMessage1);
     }
