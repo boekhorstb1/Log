@@ -35,10 +35,10 @@ class MockHandler extends BaseHandler
     use SetOptionsTrait;
     private Options $options;
 
-    /**
-     * Check variables used for testing
-     *
-     */
+
+    /** Check variables used for testing
+    *  @var mixed;
+    */
     public $check;
 
     public function __construct(Options $options = null)
