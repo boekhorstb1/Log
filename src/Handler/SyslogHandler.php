@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Horde Log package
  *
@@ -9,11 +10,13 @@
  * @package    Log
  * @subpackage Handlers
  */
+
 declare(strict_types=1);
 
 namespace Horde\Log\Handler;
 
-use Horde\Log\Filter;
+use Horde\Log\LogFilter;
+use Horde\Log\LogFormatter;
 use Horde\Log\LogHandler;
 use Horde\Log\LogMessage;
 use Horde\Log\LogException;
@@ -51,7 +54,14 @@ class SyslogHandler extends BaseHandler
      */
     protected int $lastFacility;
 
-    public function __construct(SyslogOptions $options = null, array $formatters = [], array $filters = [])
+    /**
+     * Class Constructor
+     *
+     * @param null|SyslogOptions $options  Log options.
+     * @param LogFormatter[]     $formatters  Log formatter.
+     * @param LogFilter[]        $filters  Log filter.
+     */
+    public function __construct(?SyslogOptions $options = null, array $formatters = [], array $filters = [])
     {
         $this->options = $options ?? new SyslogOptions();
         $this->formatters = $formatters;
@@ -69,7 +79,8 @@ class SyslogHandler extends BaseHandler
     public function write(LogMessage $event): bool
     {
         if (($this->options->ident !== $this->lastIdent) ||
-            ($this->options->facility !== $this->lastFacility)) {
+            ($this->options->facility !== $this->lastFacility)
+        ) {
             $this->initializeSyslog();
         }
 
@@ -89,6 +100,13 @@ class SyslogHandler extends BaseHandler
     {
         $this->lastIdent = $this->options->ident;
         $this->lastFacility = $this->options->facility;
+
+        if (!is_string($this->lastIdent)) {
+            throw new LogException('Please set the indent to a String');
+        }
+        if (!is_int($this->options->openLogOptions)) {
+            throw new LogException('Please set the openlogOptions to a log constant with integer value (e.g. LOG_PERROR). For more information look at PHP documentation about openlog() and its options parameter');
+        }
 
         if (!openlog($this->options->ident, $this->options->openLogOptions, $this->options->facility)) {
             throw new LogException('Unable to open syslog');
